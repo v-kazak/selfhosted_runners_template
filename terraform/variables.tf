@@ -24,7 +24,7 @@ variable "zone" {
 
 variable "vps_count" {
   type        = number
-  description = "Количество виртуальных машин"
+  description = "Количество создаваемых виртуальных машин"
   default     = 1
 }
 

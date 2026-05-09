@@ -1,0 +1,10 @@
+services:
+  gitlab-runner:
+    image: gitlab/gitlab-runner:latest
+    container_name: gitlab-runner
+    restart: always
+    volumes:
+      # Папка для хранения конфигурации раннера (чтобы не потерять при перезапуске)
+      - ./config:/etc/gitlab-runner
+      # Проброс сокета Docker с хоста (позволяет раннеру запускать контейнеры)
+      - /var/run/docker.sock:/var/run/docker.sock

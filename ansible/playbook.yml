@@ -1,0 +1,25 @@
+---
+- hosts: all
+  # КРИТИЧНО: отключаем автоматический сбор фактов на старте, 
+  # иначе Ansible упадет до того, как сработает модуль ожидания
+  gather_facts: false
+
+  tasks:
+
+    - name: Ожидание доступности SSH (таймаут 5 минут)
+      ansible.builtin.wait_for_connection:
+        delay: 10
+        timeout: 300
+
+    - name: Устанавливаем Docker и настраиваем систему
+      ansible.builtin.import_role:
+        name: install_docker
+      become: true
+      tags: ["Docker"]
+
+    - name: Запускаем Gitlab CI в docker
+      ansible.builtin.import_role:
+        name: runners_install_and_run
+      become: true
+      tags: ["Gitlab"]
+      

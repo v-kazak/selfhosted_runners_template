@@ -1,0 +1,26 @@
+.PHONY: start ansible terraform destroy
+start:
+	terraform -chdir=terraform init
+	terraform -chdir=terraform fmt
+	terraform -chdir=terraform validate
+	terraform -chdir=terraform apply
+	cd ansible && ansible-playbook -i inventory.ini playbook.yml
+	@echo "======================================="
+	@echo "РАЗВЕРТЫВАНИЕ ЗАВЕРШЕНО
+	@echo "======================================="
+	@echo 
+	@terraform -chdir=terraform output -raw summary
+	@echo 
+
+ansible:
+	cd ansible && ansible-playbook -i inventory.ini playbook.yml
+
+	
+terraform:
+	terraform -chdir=terraform init
+	terraform -chdir=terraform validate
+	@terraform -chdir=terraform apply
+	@terraform -chdir=terraform output -raw summary
+
+destroy:
+	terraform -chdir=terraform destroy

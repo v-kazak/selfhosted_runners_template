@@ -1,0 +1,35 @@
+- name: Копируем файлы compose
+  ansible.builtin.copy:
+    src: compose.yml
+    dest: /home/runner/compose.yml
+    owner: runner
+    group: runner
+    mode: '0744'
+  become: true
+#--docker-privileged="true"
+
+- name: Запускаем контейнер с помощью docker-compose
+  community.docker.docker_compose_v2:
+    project_src: /home/runner
+    state: present
+    pull: always
+  become_user: runner
+
+
+#--docker-privileged="true"
+- name: Register GitLab Runner
+  community.docker.docker_container_exec:
+    container: gitlab-runner
+    command: >
+          gitlab-runner register
+          --non-interactive
+          --url "{{ gitlab_runner_url }}"
+          --token "{{ gitlab_runner_token }}"
+          --executor "docker"
+          --docker-image "alpine:latest"
+          --description "ansible-managed-runner"
+   
+   
+
+
+    
