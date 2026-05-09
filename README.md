@@ -1,12 +1,12 @@
 # Self-Hosted GitLab Runner на базе Terraform + Ansible
 
-Автоматизированное развертывание самохостинг GitLab Runner в Яндекс Cloud с использованием Terraform для инфраструктуры и Ansible для конфигурации.
+Автоматизированное развертывание Self-hosted GitLab Runner в Яндекс Cloud с использованием Terraform для инфраструктуры и Ansible для конфигурации.
 
 ## 📋 Требования
 
 - Terraform >= 1.6
 - Ansible >= 2.10
-- Docker и Docker Compose установлены на машине, где будет запускаться `make terraform`
+- Docker и Docker Compose
 - Доступ к Яндекс Cloud (облако, каталог)
 - GitLab инстанс с правами создавать токены runner
 
@@ -32,20 +32,11 @@ folder_id = "your_folder_id"
 
 ### 2. Подготовка GitLab Runner конфигурации
 
-Отредактируйте `ansible/roles/runners_install_and_run/tasks/main.yml` и заполните значения:
+Отредактируйте `ansible/group_vars/web.yml` и заполните значения:
 
 ```yaml
-- name: Register GitLab Runner
-  community.docker.docker_container_exec:
-    container: gitlab-runner
-    command: >
-          gitlab-runner register
-          --non-interactive
-          --url "https://gitlab.example.com"
-          --token "glrt_your_runner_token_here"
-          --executor "docker"
-          --docker-image "alpine:latest"
-          --description "ansible-managed-runner"
+gitlab_runner_url: "https://gitlab.example.com"  # URL вашего GitLab инстанса
+gitlab_runner_token: "glrt_xxxxxxxxxxxx"         # Токен runner из GitLab
 ```
 
 **Где получить значения:**
@@ -57,16 +48,16 @@ folder_id = "your_folder_id"
 ### 3. Развертывание
 
 ```bash
-# Инициализация Terraform и развертывание инфраструктуры
-make terraform
-
-# Или все вместе (Terraform + Ansible):
+# Развёртывание 1 командой
 make start
 
-# Просмотр статуса
+# Отдельный запуск только Terraform
 make terraform
 
-# Удаление инфраструктуры
+# Отдельный запуск только Ansible
+make ansible
+
+#Удаление
 make destroy
 ```
 
@@ -102,24 +93,13 @@ make destroy
 - **Disk**: 15 ГБ (network-hdd)
 - **Image**: Debian 12
 - **Preemptible**: true (сэкономит деньги)
-- **NAT Gateway**: Для исходящего интернета без публичного IP
 
-Все параметры можно переопределить через переменные:
+Все параметры можно переопределить путём редактирования файла `terraform/variables.tf`:
 
-```bash
-# Например, 3 машины с 4 ядрами:
-terraform -chdir=terraform apply -var="vps_count=3" -var="cores_count=4"
 ```
-
-## 🌐 Сетевая архитектура
-
-- **NAT Gateway**: Машины получают исходящий интернет через NAT Gateway (без публичного IP)
-- **Приватная сеть**: 10.10.0.0/24
-- **Security Group**: Разрешены SSH (22), HTTP (80), HTTPS (443) с 0.0.0.0/0
-
-**SSH подключение:**
-- Если VM имеет публичный IP: `ssh superuser@<PUBLIC_IP>`
-- Без публичного IP: Требуется Bastion или VPN
+# Например, увеличить кол-во RAM
+memory_count = 4
+```
 
 ## 📝 Outputs после развертывания
 
@@ -144,7 +124,7 @@ terraform -chdir=terraform apply -var="vps_count=3" -var="cores_count=4"
 ## ⚙️ Ansible конфигурация
 
 Playbook выполняет:
-1. Ожидание SSH доступности (таймаут 5 минут)
+1. Ожидание SSH доступности (таймаут до 5 минут)
 2. Установка Docker
 3. Запуск GitLab Runner контейнера
 4. Регистрация runner в вашем GitLab инстансе
@@ -154,17 +134,9 @@ Playbook выполняет:
 - Токены хранятся в `secret.auto.tfvars` (**не коммитить!**)
 - GitLab runner токены передаются только при инициализации
 - SSH ключи генерируются через cloud-init и не хранятся в Terraform state
-- NAT Gateway обеспечивает приватные IP для машин
 
 ## 🐛 Troubleshooting
 
-### Ошибка: "Количество статических публичных IP-адресов 1 / 1"
-- NAT Gateway не требует публичного IP. Проверьте `nat = false` в variables.tf
-- Если нужен публичный IP: `terraform apply -var="nat=true"`
-
-### SSH таймаут при подключении к VM
-- Если VM без публичного IP, используйте приватный адрес из inventory.ini
-- Проверьте Security Group правила в Яндекс Cloud
 
 ### GitLab Runner не регистрируется
 - Проверьте правильность `--url` и `--token` в ansible playbook
@@ -176,7 +148,3 @@ Playbook выполняет:
 - [Yandex Cloud Terraform Provider](https://registry.terraform.io/providers/yandex-cloud/yandex/latest/docs)
 - [GitLab Runner Documentation](https://docs.gitlab.com/runner/)
 - [Ansible Community Docker Module](https://docs.ansible.com/ansible/latest/collections/community/docker/)
-
-## 📄 Лицензия
-
-MIT

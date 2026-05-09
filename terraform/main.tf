@@ -72,7 +72,7 @@ resource "yandex_vpc_subnet" "net" {
   folder_id      = var.folder_id
 }
 resource "local_file" "inventory" {
-  content = <<-EOT
+  content  = <<-EOT
   [web]  
   ${join("\n", [for instance in yandex_compute_instance.instance : "${coalesce(instance.network_interface[0].nat_ip_address, instance.network_interface[0].ip_address)} ansible_user=${var.ssh_user}"])}
 

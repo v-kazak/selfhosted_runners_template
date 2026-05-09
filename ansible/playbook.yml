@@ -6,7 +6,7 @@
 
   tasks:
 
-    - name: Ожидание доступности SSH (таймаут 5 минут)
+    - name: Ожидание доступности SSH (таймаут до 5 минут)
       ansible.builtin.wait_for_connection:
         delay: 10
         timeout: 300

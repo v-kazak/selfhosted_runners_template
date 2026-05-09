@@ -6,7 +6,7 @@ start:
 	terraform -chdir=terraform apply
 	cd ansible && ansible-playbook -i inventory.ini playbook.yml
 	@echo "======================================="
-	@echo "РАЗВЕРТЫВАНИЕ ЗАВЕРШЕНО
+	@echo "РАЗВЕРТЫВАНИЕ ЗАВЕРШЕНО"
 	@echo "======================================="
 	@echo 
 	@terraform -chdir=terraform output -raw summary

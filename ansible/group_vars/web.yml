@@ -1,5 +1,5 @@
 ansible_ssh_private_key_file: ~/.ssh/id_ed25519
 
 # ОБЯЗАТЕЛЬНО заполните эти значения перед запуском playbook!
-gitlab_runner_url: "https://gitlab.example.com"  # URL вашего GitLab инстанса
-gitlab_runner_token: "glrt_xxxxxxxxxxxx"         # Токен runner из GitLab
+gitlab_runner_url: ""    # URL вашего GitLab инстанса
+gitlab_runner_token: ""  # Токен runner из GitLab
