@@ -65,8 +65,8 @@ make destroy
 
 ```
 .
-├── terraform/              # Terraform конфигурация
-│   ├── main.tf            # Основные ресурсы (VPC, VM, NAT Gateway)
+├── terraform/             # Terraform конфигурация
+│   ├── main.tf            # Основные ресурсы (VPC, VM,)
 │   ├── variables.tf       # Переменные Terraform
 │   ├── local.tf           # Локальные переменные
 │   ├── output.tf          # Outputs (IP адреса, SSH команда)
